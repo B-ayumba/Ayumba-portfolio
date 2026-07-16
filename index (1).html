@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bryan Ayumba — Network Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a141f;
+    --panel: #101f2e;
+    --panel-alt: #14283a;
+    --line: #22374a;
+    --text: #e9f1f6;
+    --text-dim: #8ea6b8;
+    --cyan: #3fd0c9;
+    --amber: #f2a93b;
+    --radius: 4px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    background-attachment:fixed;
+    background-position:center;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit;}
+
+  ::selection{background:var(--cyan); color:#06171a;}
+
+  /* Focus visibility */
+  a:focus-visible, button:focus-visible{outline:2px solid var(--cyan); outline-offset:3px;}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+
+  /* NAV */
+  header.nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,20,31,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px; max-width:1080px; margin:0 auto;
+  }
+  .brand{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:15px; letter-spacing:0.02em;}
+  .brand .dot{color:var(--cyan);}
+  nav.links{display:flex; gap:28px; font-size:13px; font-family:'JetBrains Mono', monospace; color:var(--text-dim);}
+  nav.links a{text-decoration:none; transition:color .15s ease;}
+  nav.links a:hover{color:var(--cyan);}
+
+  /* HERO */
+  .hero{
+    padding:96px 0 80px;
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:48px;
+    align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'JetBrains Mono', monospace; font-size:12px;
+    color:var(--cyan); letter-spacing:0.08em; text-transform:uppercase;
+    border:1px solid rgba(63,208,201,0.35); background:rgba(63,208,201,0.06);
+    padding:5px 10px; border-radius:20px; margin-bottom:22px;
+  }
+  .eyebrow .pulse{
+    width:6px; height:6px; border-radius:50%; background:var(--cyan);
+    box-shadow:0 0 0 0 rgba(63,208,201,0.6);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(63,208,201,0.55);}
+    70%{box-shadow:0 0 0 8px rgba(63,208,201,0);}
+    100%{box-shadow:0 0 0 0 rgba(63,208,201,0);}
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:800;
+    font-size:clamp(34px, 4.4vw, 52px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin-bottom:16px;
+  }
+  h1 span{color:var(--cyan);}
+  .role{
+    font-size:17px; color:var(--text-dim); margin-bottom:22px; max-width:46ch;
+  }
+  .hero p.summary{color:var(--text-dim); max-width:52ch; margin-bottom:32px; font-size:15px;}
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:500;
+    padding:12px 20px; border-radius:var(--radius); text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px; transition:all .15s ease;
+  }
+  .btn-primary{background:var(--cyan); color:#06171a; border:1px solid var(--cyan);}
+  .btn-primary:hover{background:#59ddd6;}
+  .btn-ghost{border:1px solid var(--line); color:var(--text);}
+  .btn-ghost:hover{border-color:var(--cyan); color:var(--cyan);}
+
+  /* NETWORK DIAGRAM */
+  .topo{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:20px;
+    position:relative;
+  }
+  .topo-label{
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-dim);
+    display:flex; justify-content:space-between; margin-bottom:8px;
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .topo-label .status{color:var(--amber);}
+  .packet{
+    fill:var(--cyan);
+    animation:travel linear infinite;
+    offset-rotate:0deg;
+  }
+  .link-line{stroke:var(--line); stroke-width:1.5;}
+  .link-line.active{stroke:rgba(63,208,201,0.35); stroke-dasharray:4 4;}
+  .node-core circle{fill:var(--panel-alt); stroke:var(--cyan); stroke-width:2;}
+  .node circle{fill:var(--panel-alt); stroke:var(--line); stroke-width:1.5;}
+  .node text, .node-core text{
+    font-family:'JetBrains Mono', monospace; fill:var(--text); font-size:10.5px;
+  }
+  .node-core text{fill:var(--cyan); font-weight:700; font-size:12px;}
+
+  /* SECTIONS */
+  section{padding:64px 0; border-top:1px solid var(--line);}
+  .section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:36px;}
+  .section-num{font-family:'JetBrains Mono', monospace; color:var(--cyan); font-size:13px;}
+  .section-title{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:22px;}
+  .section-title .path{color:var(--text-dim); font-weight:400; font-size:14px; margin-left:2px;}
+
+  /* ABOUT */
+  .about-grid{display:grid; grid-template-columns:1fr 280px; gap:48px;}
+  .about-text p{color:var(--text-dim); margin-bottom:16px; font-size:15.5px;}
+  .stat-panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:22px;
+    display:flex; flex-direction:column; gap:18px; height:fit-content;
+  }
+  .stat{display:flex; justify-content:space-between; align-items:baseline; font-family:'JetBrains Mono', monospace;}
+  .stat .k{color:var(--text-dim); font-size:12px;}
+  .stat .v{color:var(--cyan); font-size:20px; font-weight:700;}
+
+  /* SKILLS as "interfaces" table */
+  .iface-table{border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  .iface-row{
+    display:grid; grid-template-columns:180px 1fr 90px;
+    padding:16px 20px; border-bottom:1px solid var(--line);
+    align-items:center; gap:16px;
+  }
+  .iface-row:last-child{border-bottom:none;}
+  .iface-row:nth-child(odd){background:var(--panel);}
+  .iface-name{font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:600;}
+  .iface-desc{color:var(--text-dim); font-size:13.5px;}
+  .iface-status{
+    font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--cyan);
+    display:flex; align-items:center; gap:6px; justify-content:flex-end;
+  }
+  .iface-status::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--cyan);}
+
+  /* EXPERIENCE timeline */
+  .route{position:relative; padding-left:28px;}
+  .route::before{
+    content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1px;
+    background:linear-gradient(var(--cyan), var(--line));
+  }
+  .hop{position:relative; padding-bottom:36px;}
+  .hop:last-child{padding-bottom:0;}
+  .hop::before{
+    content:''; position:absolute; left:-28px; top:4px; width:11px; height:11px;
+    border-radius:50%; background:var(--bg); border:2px solid var(--cyan);
+  }
+  .hop-head{display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:6px;}
+  .hop-title{font-family:'JetBrains Mono', monospace; font-weight:700; font-size:15px;}
+  .hop-meta{font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:12px;}
+  .hop-desc{color:var(--text-dim); font-size:14.5px; max-width:64ch;}
+  .edit-flag{
+    display:inline-block; margin-top:6px; font-family:'JetBrains Mono', monospace;
+    font-size:11px; color:var(--amber); border:1px dashed rgba(242,169,59,0.4);
+    padding:2px 8px; border-radius:20px;
+  }
+
+  /* CONTACT */
+  .terminal{
+    background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    padding:28px; font-family:'JetBrains Mono', monospace; font-size:13.5px;
+    max-width:640px;
+  }
+  .terminal .line{margin-bottom:10px; display:flex; gap:10px;}
+  .terminal .prompt{color:var(--cyan);}
+  .terminal .comment{color:var(--text-dim);}
+  .contact-links{display:flex; gap:16px; flex-wrap:wrap; margin-top:20px;}
+
+  footer{padding:32px; text-align:center; color:var(--text-dim); font-family:'JetBrains Mono', monospace; font-size:12px; border-top:1px solid var(--line);}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr; padding-top:56px;}
+    .about-grid{grid-template-columns:1fr;}
+    .iface-row{grid-template-columns:1fr; gap:4px;}
+    .iface-status{justify-content:flex-start;}
+    nav.links{display:none;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .packet{animation:none; opacity:0;}
+    .eyebrow .pulse{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">BRYAN<span class="dot">·</span>AYUMBA</div>
+    <nav class="links">
+      <a href="#about">about</a>
+      <a href="#skills">skills</a>
+      <a href="#experience">experience</a>
+      <a href="#contact">contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero" style="border-top:none;">
+    <div>
+      <div class="eyebrow"><span class="pulse"></span>Available for opportunities</div>
+      <h1>Bryan Ayumba<br>Network <span>Engineer</span></h1>
+      <p class="role">Building and maintaining resilient LAN/WAN infrastructure for 8 years.</p>
+      <p class="summary">Results-driven network engineer with a strong track record of accurate system repairs, troubleshooting, and infrastructure planning — backed by hands-on experience in software development and operations leadership, plus exemplary project management and communication skills.</p>
+      <div class="cta-row">
+        <a href="#contact" class="btn btn-primary">Get in touch →</a>
+        <a href="#experience" class="btn btn-ghost">View experience</a>
+      </div>
+    </div>
+
+    <div class="topo">
+      <div class="topo-label"><span>NET://topology</span><span class="status">● 4 nodes up</span></div>
+      <svg viewBox="0 0 400 320" width="100%" height="auto" role="img" aria-label="Diagram showing Bryan connected to core competencies: routing and switching, network security, WAN/LAN infrastructure, and troubleshooting">
+        <!-- links -->
+        <line class="link-line active" x1="200" y1="160" x2="90" y2="60"></line>
+        <line class="link-line active" x1="200" y1="160" x2="310" y2="60"></line>
+        <line class="link-line active" x1="200" y1="160" x2="90" y2="260"></line>
+        <line class="link-line active" x1="200" y1="160" x2="310" y2="260"></line>
+
+        <!-- packets traveling along links -->
+        <circle class="packet" r="3" style="offset-path:path('M200,160 L90,60'); animation-duration:2.6s;"></circle>
+        <circle class="packet" r="3" style="offset-path:path('M200,160 L310,60'); animation-duration:3.4s; animation-delay:.4s;"></circle>
+        <circle class="packet" r="3" style="offset-path:path('M200,160 L90,260'); animation-duration:3s; animation-delay:.9s;"></circle>
+        <circle class="packet" r="3" style="offset-path:path('M200,160 L310,260'); animation-duration:2.8s; animation-delay:1.3s;"></circle>
+
+        <!-- core node -->
+        <g class="node-core">
+          <circle cx="200" cy="160" r="30"></circle>
+          <text x="200" y="164" text-anchor="middle">BA</text>
+        </g>
+
+        <!-- peripheral nodes -->
+        <g class="node">
+          <circle cx="90" cy="60" r="24"></circle>
+          <text x="90" y="52" text-anchor="middle">Routing &amp;</text>
+          <text x="90" y="65" text-anchor="middle">Switching</text>
+        </g>
+        <g class="node">
+          <circle cx="310" cy="60" r="24"></circle>
+          <text x="310" y="52" text-anchor="middle">Network</text>
+          <text x="310" y="65" text-anchor="middle">Security</text>
+        </g>
+        <g class="node">
+          <circle cx="90" cy="260" r="24"></circle>
+          <text x="90" y="252" text-anchor="middle">WAN / LAN</text>
+          <text x="90" y="265" text-anchor="middle">Infra</text>
+        </g>
+        <g class="node">
+          <circle cx="310" cy="260" r="24"></circle>
+          <text x="310" y="252" text-anchor="middle">Troubleshoot</text>
+          <text x="310" y="265" text-anchor="middle">-ing</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">About<span class="path"> · /home/bryan/about</span></span>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>Results-driven network engineer with 8 years of expertise deploying and maintaining LAN and WAN infrastructure across growing organizations. Dedicated to keeping networks fast, secure, and available — with a strong track record of accurately diagnosing system faults and resolving them before they become downtime.</p>
+        <p>Beyond the terminal, Bryan brings exemplary planning, project management, and communication skills to every engagement — translating technical infrastructure work into clear updates for stakeholders and teams.</p>
+      </div>
+      <div class="stat-panel">
+        <div class="stat"><span class="k">Experience</span><span class="v">8 yrs</span></div>
+        <div class="stat"><span class="k">Focus</span><span class="v">LAN / WAN</span></div>
+        <div class="stat"><span class="k">Status</span><span class="v">Open to work</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">Core competencies<span class="path"> · show interfaces</span></span>
+    </div>
+    <div class="iface-table">
+      <div class="iface-row">
+        <div class="iface-name">Routing</div>
+        <div class="iface-desc">IP address structure, Cisco router and switch security, LAN/WAN deployment</div>
+        <div class="iface-status">UP</div>
+      </div>
+      <div class="iface-row">
+        <div class="iface-name">Strategy</div>
+        <div class="iface-desc">Strategic planning and execution across technology and operations projects</div>
+        <div class="iface-status">UP</div>
+      </div>
+      <div class="iface-row">
+        <div class="iface-name">Clients</div>
+        <div class="iface-desc">Client account management and stakeholder relationship building</div>
+        <div class="iface-status">UP</div>
+      </div>
+      <div class="iface-row">
+        <div class="iface-name">People</div>
+        <div class="iface-desc">Staff training and development, performance management frameworks</div>
+        <div class="iface-status">UP</div>
+      </div>
+      <div class="iface-row">
+        <div class="iface-name">Support</div>
+        <div class="iface-desc">Network support for hubs, bridges, routers and multi-vendor hardware</div>
+        <div class="iface-status">UP</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">Experience<span class="path"> · traceroute --history</span></span>
+    </div>
+    <div class="route">
+      <div class="hop">
+        <div class="hop-head">
+          <span class="hop-title">Director of Operations</span>
+          <span class="hop-meta">Tanda Net Limited · Nairobi, Kenya · 2023 – 2025</span>
+        </div>
+        <p class="hop-desc">Led end-to-end operations for an ISP serving Nairobi, including design and rollout of FTTH (Fibre-to-the-Home) network infrastructure. Directed operational strategy, resource planning, and cross-functional delivery to scale network coverage.</p>
+      </div>
+      <div class="hop">
+        <div class="hop-head">
+          <span class="hop-title">Director of Operations</span>
+          <span class="hop-meta">Shay Byn Works Ltd · Nairobi, Kenya · Dec 2019 – Jun 2021</span>
+        </div>
+        <p class="hop-desc">Monitored office workflow and administrative processes to keep operations running smoothly. Assessed performance management structures and implemented enhancements to strengthen results. Analyzed technology, resource needs, and market demand to plan and assess feasibility of company projects.</p>
+      </div>
+      <div class="hop">
+        <div class="hop-head">
+          <span class="hop-title">Software Developer</span>
+          <span class="hop-meta">Global Orange · Amsterdam, Netherlands · May 2018 – Nov 2019</span>
+        </div>
+        <p class="hop-desc">Reviewed code, debugged problems, and corrected issues. Contributed ideas in team meetings and delivered updates on deadlines, designs, and enhancements. Gathered and defined customer requirements to develop clear specifications for project plans, managing milestones from initial steps through final delivery.</p>
+      </div>
+      <div class="hop">
+        <div class="hop-head">
+          <span class="hop-title">Network Engineer</span>
+          <span class="hop-meta">GTECH · Nairobi, Kenya · Jan 2015 – Apr 2018</span>
+        </div>
+        <p class="hop-desc">Provided complete end-to-end engineering and installation of route-based IP network solutions. Troubleshot complex multi-vendor network service provider issues and escalated emergency technical issues to maintain optimum uptime. Configured, managed, and troubleshot VoIP and multi-media distributed systems, collaborating with vendors to select and install routers that optimized network performance.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <span class="section-title">Contact<span class="path"> · ping bryan</span></span>
+    </div>
+    <div class="terminal">
+      <div class="line"><span class="comment">&gt; Bryan Ayumba, Network Engineer</span></div>
+      <div class="line"><span class="comment">&gt; location: Nairobi, Kenya</span></div>
+      <div class="line"><span class="comment">&gt; phone: +254 718 814 979</span></div>
+      <div class="line"><span class="comment">&gt; email: ayumbabryan@gmail.com</span></div>
+      <div class="contact-links">
+        <a href="mailto:ayumbabryan@gmail.com" class="btn btn-primary">Email me</a>
+        <a href="tel:+254718814979" class="btn btn-ghost">Call me</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>© 2026 Bryan Ayumba — Network Engineer</footer>
+
+</body>
+</html>
